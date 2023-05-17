@@ -4,7 +4,7 @@ import styles from './common.module.scss'
 import { useSearchParams } from 'react-router-dom'
 import { useTitle,  } from 'ahooks';
 import { Typography ,Empty} from 'antd'
-
+import ListSearch from '../../components/ListSearch'
 const Star: FC = () => {
   useTitle('问卷-标星问卷')
   const [questionList, setQuestionList] = useState([
@@ -40,7 +40,7 @@ const Star: FC = () => {
         <div className={styles.left}>
           <Typography.Title level={3}>星标问卷</Typography.Title>
         </div>
-        <div className={styles.right}>(搜索) </div>
+        <div className={styles.right}><ListSearch/> </div>
       </div>
       <div className={styles.content}>
         {questionList.length===0&&<Empty description='暂无数据'/>}
