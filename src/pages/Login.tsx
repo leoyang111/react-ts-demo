@@ -3,7 +3,11 @@ import styles from './Login.module.scss'
 import { Typography, Space, Form, Input, Button, message, Checkbox } from 'antd'
 import { UserAddOutlined } from '@ant-design/icons'
 import { REGISTER_PATHNAME } from '../router'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { loginService } from '../services/user'
+import { useRequest } from 'ahooks'
+import { MANAGE_INDEX_PATHNAME } from '../router'
+import { setToken } from '../utils/user-token'
 const { Title } = Typography
 const USERNAME_KEY = 'USERNAME'
 const PASSWORD_KEY = 'PASSWORD'
@@ -25,6 +29,7 @@ function getUserInfoFromStorage() {
 }
 
 const Login: FC = () => {
+  const nav = useNavigate()
   const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
@@ -37,12 +42,29 @@ const Login: FC = () => {
   const onFinish = (values: any) => {
     console.log(values)
     const { username, password, remember } = values
+    run({ username, password })
     if (remember) {
       rememberUser(username, password)
     } else {
       deleteUserFromStorage()
     }
   }
+
+  const { run } = useRequest(
+    async values => {
+      const { username, password } = values
+      return await loginService(username, password)
+    },
+    {
+      manual: true,
+      onSuccess(res) {
+        const { token = '' } = res
+        setToken(token)
+        message.success('登录成功')
+        nav(MANAGE_INDEX_PATHNAME)
+      },
+    }
+  )
   return (
     <div className={styles.container}>
       <div>

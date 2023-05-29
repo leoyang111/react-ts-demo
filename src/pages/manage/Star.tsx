@@ -2,55 +2,41 @@ import React, { FC, useState } from 'react'
 import QuestionCard from '../../components/QuestionComponents/QuestionCard'
 import styles from './common.module.scss'
 import { useSearchParams } from 'react-router-dom'
-import { useTitle,  } from 'ahooks';
-import { Typography ,Empty} from 'antd'
+import { useTitle } from 'ahooks'
+import { Typography, Empty, Spin  } from 'antd'
 import ListSearch from '../../components/ListSearch'
+import useLoadQuestionListData from '../../hooks/useLoadQuestionListData'
+import ListPage from '../../components/ListPage'
 const Star: FC = () => {
   useTitle('问卷-标星问卷')
-  const [questionList, setQuestionList] = useState([
-    {
-      _id: 'q1',
-      title: '问卷1',
-      isPublished: true,
-      isStart: true,
-      answerCount: 5,
-      createAt: '3月10日 13:22',
-    },
-    {
-      _id: 'q2',
-      title: '问卷2',
-      isPublished: false,
-      isStart: true,
-      answerCount: 5,
-      createAt: '3月10日 13:22',
-    },
-    {
-      _id: 'q3',
-      title: '问卷3',
-      isPublished: false,
-      isStart: true,
-      answerCount: 5,
-      createAt: '3月10日 13:22',
-    },
-
-  ])
+  const { data = {}, loading } = useLoadQuestionListData({ isStart: true })
+  const { list = [], total = 0 } = data
   return (
     <>
       <div className={styles.header}>
         <div className={styles.left}>
           <Typography.Title level={3}>星标问卷</Typography.Title>
         </div>
-        <div className={styles.right}><ListSearch/> </div>
+        <div className={styles.right}>
+          <ListSearch />{' '}
+        </div>
       </div>
       <div className={styles.content}>
-        {questionList.length===0&&<Empty description='暂无数据'/>}
-        {questionList.length>0 &&
-          questionList.map(q => {
+        {loading && (
+          <div style={{ textAlign: 'center' }}>
+            <Spin />{' '}
+          </div>
+        )}
+        {!loading&&list.length === 0 && <Empty description="暂无数据" />}
+        {list.length &&
+          list.map((q: any) => {
             const { _id } = q
             return <QuestionCard key={_id} {...q} />
           })}
       </div>
-      <div className={styles.footer}> 分页</div>
+      <div className={styles.footer}> 
+       <ListPage  total={total} />
+      </div>
     </>
   )
 }
